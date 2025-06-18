@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekoverzicht</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: white;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .widget {
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      font-size: 1.1rem;
+      max-width: 300px;
+    }
+    .highlight {
+      font-weight: bold;
+    }
+    .motivatie {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget" id="weekWidget">
+    <p>Bezig met laden...</p>
+  </div>
+
+  <script>
+    const dagen = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag"];
+    const maanden = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
+
+    function getWeekNumber(d) {
+      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+      return weekNo;
+    }
+
+    function getStartAndEndOfWeek(date) {
+      const day = date.getDay();
+      const monday = new Date(date);
+      monday.setDate(date.getDate() - ((day + 6) % 7));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      return { monday, sunday };
+    }
+
+    function formatDate(d) {
+      return `${d.getDate()} ${maanden[d.getMonth()]}`;
+    }
+
+    const vandaag = new Date();
+    const dagNaam = dagen[vandaag.getDay()];
+    const maandNaam = maanden[vandaag.getMonth()];
+    const datumStr = `${dagNaam} ${vandaag.getDate()} ${maandNaam} ${vandaag.getFullYear()}`;
+
+    const weeknummer = getWeekNumber(vandaag);
+    const weekDag = ((vandaag.getDay() + 6) % 7) + 1;
+
+    const { monday, sunday } = getStartAndEndOfWeek(vandaag);
+    const weekRange = `van maandag ${formatDate(monday)} t/m zondag ${formatDate(sunday)}`;
+
+    const output = `
+      <div class="highlight">Vandaag is ${datumStr}</div><br>
+      <div>Week <span class="highlight">${weeknummer}</span> van ${vandaag.getFullYear()}</div>
+      <div>Deze week loopt ${weekRange}</div>
+      <div>Je zit op dag ${weekDag} van week ${weeknummer}</div>
+      <div class="motivatie">Nieuwe week, nieuwe kansen! 💪</div>
+    `;
+
+    document.getElementById("weekWidget").innerHTML = output;
+  </script>
+</body>
+</html>
